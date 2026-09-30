@@ -16,18 +16,66 @@ BASE_DIR = Path(os.environ.get("ISL_HACKATHON_DIR", Path(__file__).resolve().par
 DATA_DIR = BASE_DIR / "INCLUDE_50"
 OUTPUT_LABEL_JSON = BASE_DIR / "KEYPOINTS" / "labels.json"
 
-EXPECTED_50_CLASSES = sorted([
-    "Bank", "Bird", "Black", "Boy", "Brother", "Car", "Cell phone",
-    "Court", "Cow", "Death", "Dog", "Election", "Fall", "Fan", "Father",
-    "Girl", "Good Morning", "Hat", "Hello", "House", "I", "Monday",
-    "Paint", "Pen", "Priest", "Red", "Shoes", "Shop", "Summer",
-    "T-Shirt", "Teacher", "Thank you", "Time", "White", "Window", "Year",
-    "Large", "Dry", "Good", "Happy", "Hot", "It", "Long", "Loud",
-    "New", "Quiet", "Short", "Small", "Train Ticket", "You (plural)"
-], key=lambda s: s.lower())
+OFFICIAL_FOLDER_MAP = {
+    "1. Dog": "Dog",
+    "1. loud": "Loud",
+    "11. Car": "Car",
+    "14. Election": "Election",
+    "16. train ticket": "Train Ticket",
+    "19. House": "House",
+    "2. Death": "Death",
+    "2. quiet": "Quiet",
+    "23. Court": "Court",
+    "28. Store or Shop": "Shop",
+    "28. Window": "Window",
+    "3. happy": "Happy",
+    "34. Pen": "Pen",
+    "35. Bank": "Bank",
+    "37. Hat": "Hat",
+    "4. Bird": "Bird",
+    "40. I": "I",
+    "40. Paint": "Paint",
+    "42. T-Shirt": "T-Shirt",
+    "44. Shoes": "Shoes",
+    "44. it": "It",
+    "46. you (plural)": "You (plural)",
+    "47. Red": "Red",
+    "48. Hello": "Hello",
+    "5. Cow": "Cow",
+    "51. Good Morning": "Good Morning",
+    "53. Fan": "Fan",
+    "54. Black": "Black",
+    "54. Cell phone": "Cell phone",
+    "55. Thank you": "Thank you",
+    "55. White": "White",
+    "61. Father": "Father",
+    "61. Summer": "Summer",
+    "64. Fall": "Fall",
+    "66. Brother": "Brother",
+    "67. Monday": "Monday",
+    "77. Boy": "Boy",
+    "78. Girl": "Girl",
+    "78. Year": "Year",
+    "78. long": "Long",
+    "79. short": "Short",
+    "83. big large": "Large",
+    "84. Teacher": "Teacher",
+    "84. small little": "Small",
+    "86. Time": "Time",
+    "87. hot": "Hot",
+    "91. Priest": "Priest",
+    "91. new": "New",
+    "94. good": "Good",
+    "97. dry": "Dry"
+}
 
-def clean_class_name(raw_name: str) -> str:
-    cleaned = re.sub(r"^\d+\.\s*", "", raw_name).strip()
+EXPECTED_50_CLASSES = sorted(list(set(OFFICIAL_FOLDER_MAP.values())), key=lambda s: s.lower())
+
+def clean_class_name(raw_folder_name: str) -> str:
+    if raw_folder_name in OFFICIAL_FOLDER_MAP:
+        return OFFICIAL_FOLDER_MAP[raw_folder_name]
+    # Fallback heuristic
+    cleaned = re.sub(r"^\d+\.\s*", "", raw_folder_name).strip()
     lookup = {c.lower(): c for c in EXPECTED_50_CLASSES}
     return lookup.get(cleaned.lower(), cleaned)
 
@@ -37,9 +85,9 @@ def main():
     print("=" * 65)
 
     found_classes = set()
-    folder_to_clean = {}
+    folder_to_clean = dict(OFFICIAL_FOLDER_MAP)
 
-    if DATA_DIR.exists():
+    if DATA_DIR.exists() and any(DATA_DIR.iterdir()):
         for root, dirs, files in os.walk(DATA_DIR):
             for d in dirs:
                 full_dir = Path(root) / d
@@ -49,7 +97,6 @@ def main():
                     found_classes.add(clean_name)
                     folder_to_clean[d] = clean_name
     else:
-        print(f"[!] Directory {DATA_DIR} does not exist yet. Initializing default target 50 classes.")
         found_classes = set(EXPECTED_50_CLASSES)
 
     print(f"\nNumber of classes found: {len(found_classes)}")
@@ -69,6 +116,15 @@ def main():
 
     OUTPUT_LABEL_JSON.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_LABEL_JSON, "w", encoding="utf-8") as f:
+        json.dump({
+            "classes": sorted_classes,
+            "class_to_idx": {c: i for i, c in enumerate(sorted_classes)},
+            "folder_mapping": folder_to_clean
+        }, f, indent=2)
+
+    # Also update CODE/labels.json
+    code_labels = BASE_DIR / "CODE" / "labels.json"
+    with open(code_labels, "w", encoding="utf-8") as f:
         json.dump({
             "classes": sorted_classes,
             "class_to_idx": {c: i for i, c in enumerate(sorted_classes)},

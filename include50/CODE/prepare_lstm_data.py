@@ -37,19 +37,35 @@ def interpolate_sequence(seq: np.ndarray, target_len: int = 30) -> np.ndarray:
     return interpolated
 
 def generate_synthetic_samples_for_class(class_idx: int, num_samples: int = 15) -> np.ndarray:
-    """Generates biomechanically plausible 134-D temporal trajectories for fast hackathon initialization."""
+    """Generates biomechanically distinct 134-D temporal trajectories for fast hackathon initialization."""
     samples = []
     t = np.linspace(0, np.pi * 2, TARGET_SEQUENCE_LENGTH)
+    
+    # Class-specific spatial and kinematic parameters
+    np.random.seed(42 + class_idx)
+    base_pose_pattern = np.random.uniform(-0.5, 0.5, 50).astype(np.float32)
+    base_lh_pattern   = np.random.uniform(-0.8, 0.8, 42).astype(np.float32)
+    base_rh_pattern   = np.random.uniform(-0.8, 0.8, 42).astype(np.float32)
+    
+    freq = 0.5 + (class_idx % 7) * 0.35
+    harm = 1.0 + ((class_idx * 3) % 5) * 0.4
+    
     for _ in range(num_samples):
         seq = np.zeros((TARGET_SEQUENCE_LENGTH, FEATURE_DIM), dtype=np.float32)
-        freq = 1.0 + (class_idx % 5) * 0.2
-        phase = np.random.uniform(-0.2, 0.2)
+        phase = np.random.uniform(-0.1, 0.1)
+        scale = np.random.uniform(0.9, 1.1)
         
-        # Upper body pose
-        seq[:, 0:50] = 0.5 + 0.1 * np.sin(t * freq + phase)[:, None] + np.random.normal(0, 0.01, (TARGET_SEQUENCE_LENGTH, 50))
-        # Hands
-        seq[:, 50:92] = 0.4 + 0.2 * np.cos(t * freq + phase)[:, None] + np.random.normal(0, 0.02, (TARGET_SEQUENCE_LENGTH, 42))
-        seq[:, 92:134] = 0.6 + 0.2 * np.sin(t * freq + phase)[:, None] + np.random.normal(0, 0.02, (TARGET_SEQUENCE_LENGTH, 42))
+        # Temporal dynamics
+        temporal_curve = np.sin(t * freq + phase)[:, None] * scale
+        harmonic_curve = np.cos(t * harm + phase)[:, None] * 0.5
+        
+        # Upper body pose (0..49)
+        seq[:, 0:50] = 0.5 + base_pose_pattern * (0.3 + 0.7 * temporal_curve) + np.random.normal(0, 0.01, (TARGET_SEQUENCE_LENGTH, 50))
+        # Left hand (50..91)
+        seq[:, 50:92] = 0.5 + base_lh_pattern * (0.4 + 0.6 * harmonic_curve) + np.random.normal(0, 0.015, (TARGET_SEQUENCE_LENGTH, 42))
+        # Right hand (92..133)
+        seq[:, 92:134] = 0.5 + base_rh_pattern * (0.4 + 0.6 * temporal_curve) + np.random.normal(0, 0.015, (TARGET_SEQUENCE_LENGTH, 42))
+        
         samples.append(seq)
     return np.array(samples, dtype=np.float32)
 
