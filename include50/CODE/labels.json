@@ -1,0 +1,21 @@
+{
+  "classes": [
+    "Bank", "Bird", "Black", "Boy", "Brother", "Car", "Cell phone",
+    "Court", "Cow", "Death", "Dog", "Election", "Fall", "Fan", "Father",
+    "Girl", "Good Morning", "Hat", "Hello", "House", "I", "Monday",
+    "Paint", "Pen", "Priest", "Red", "Shoes", "Shop", "Summer",
+    "T-Shirt", "Teacher", "Thank you", "Time", "White", "Window", "Year",
+    "Large", "Dry", "Good", "Happy", "Hot", "It", "Long", "Loud",
+    "New", "Quiet", "Short", "Small", "Train Ticket", "You (plural)"
+  ],
+  "class_to_idx": {
+    "Bank": 0, "Bird": 1, "Black": 2, "Boy": 3, "Brother": 4, "Car": 5, "Cell phone": 6,
+    "Court": 7, "Cow": 8, "Death": 9, "Dog": 10, "Election": 11, "Fall": 12, "Fan": 13, "Father": 14,
+    "Girl": 15, "Good Morning": 16, "Hat": 17, "Hello": 18, "House": 19, "I": 20, "Monday": 21,
+    "Paint": 22, "Pen": 23, "Priest": 24, "Red": 25, "Shoes": 26, "Shop": 27, "Summer": 28,
+    "T-Shirt": 29, "Teacher": 30, "Thank you": 31, "Time": 32, "White": 33, "Window": 34, "Year": 35,
+    "Large": 36, "Dry": 37, "Good": 38, "Happy": 39, "Hot": 40, "It": 41, "Long": 42, "Loud": 43,
+    "New": 44, "Quiet": 45, "Short": 46, "Small": 47, "Train Ticket": 48, "You (plural)": 49
+  },
+  "folder_mapping": {}
+}
