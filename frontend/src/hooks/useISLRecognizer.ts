@@ -3,7 +3,7 @@ import { PredictionResult, HandData } from '../types/isl';
 import { MediaPipeHandsService } from '../services/mediapipe';
 import { RealtimeWebSocketService } from '../services/websocket';
 import { ApiService } from '../services/api';
-import { TAMIL_MAP } from '../utils/tamilTranslations';
+import { TAMIL_MAP, SIGN_SENTENCES_MAP } from '../utils/tamilTranslations';
 
 export interface RecognizerState {
   currentPrediction: PredictionResult | null;
@@ -57,7 +57,16 @@ export function useISLRecognizer(options?: {
 
   // Update sentence when accumulated signs change
   const updateSentences = useCallback(async (signs: string[]) => {
-    if (signs.length === 0) {
+    // Filter and deduplicate consecutive tokens
+    const cleanSigns: string[] = [];
+    for (const s of signs) {
+      const upper = s.trim().toUpperCase();
+      if (upper && (!cleanSigns.length || cleanSigns[cleanSigns.length - 1] !== upper)) {
+        cleanSigns.push(upper);
+      }
+    }
+
+    if (cleanSigns.length === 0) {
       setState(prev => ({
         ...prev,
         accumulatedSigns: [],
@@ -67,24 +76,48 @@ export function useISLRecognizer(options?: {
       return;
     }
 
+    // Instant rich sentence prediction for single sign
+    if (cleanSigns.length === 1) {
+      const single = cleanSigns[0];
+      const singleMapped = SIGN_SENTENCES_MAP[single];
+      if (singleMapped) {
+        setState(prev => ({
+          ...prev,
+          accumulatedSigns: cleanSigns,
+          englishSentence: singleMapped.en,
+          tamilSentence: singleMapped.ta
+        }));
+      }
+    }
+
     try {
-      const translation = await ApiService.translateSentence(signs);
+      const translation = await ApiService.translateSentence(cleanSigns);
       setState(prev => ({
         ...prev,
-        accumulatedSigns: signs,
+        accumulatedSigns: cleanSigns,
         englishSentence: translation.english_text,
         tamilSentence: translation.tamil_text
       }));
     } catch (e) {
-      // Fallback local translation
-      const eng = signs.map(s => s.charAt(0) + s.slice(1).toLowerCase()).join(' ') + '.';
-      const tam = signs.map(s => TAMIL_MAP[s] || s).join(' ');
-      setState(prev => ({
-        ...prev,
-        accumulatedSigns: signs,
-        englishSentence: eng,
-        tamilSentence: tam
-      }));
+      // Fallback local translation with single sign expansion
+      if (cleanSigns.length === 1 && SIGN_SENTENCES_MAP[cleanSigns[0]]) {
+        const item = SIGN_SENTENCES_MAP[cleanSigns[0]];
+        setState(prev => ({
+          ...prev,
+          accumulatedSigns: cleanSigns,
+          englishSentence: item.en,
+          tamilSentence: item.ta
+        }));
+      } else {
+        const eng = cleanSigns.map(s => SIGN_SENTENCES_MAP[s]?.en || (s.charAt(0) + s.slice(1).toLowerCase())).join(' ');
+        const tam = cleanSigns.map(s => TAMIL_MAP[s] || s).join(' ');
+        setState(prev => ({
+          ...prev,
+          accumulatedSigns: cleanSigns,
+          englishSentence: eng,
+          tamilSentence: tam
+        }));
+      }
     }
   }, []);
 
@@ -115,24 +148,35 @@ export function useISLRecognizer(options?: {
       averageConfidence: Math.round(avgConf * 1000) / 10
     }));
 
-    // Auto-accumulate sign into live sentence if stable
-    const signToConsider = pred.sign;
+    // Auto-accumulate sign into live sentence if stable & strictly deduplicated
+    const signToConsider = pred.sign ? pred.sign.toUpperCase().trim() : '';
     const now = Date.now();
 
+    if (!hasHand) {
+      // If hands are lowered for > 1000ms, reset last added sign ref to allow signing again
+      if (now - lastSignAddedTimeRef.current > 1000) {
+        lastAddedSignRef.current = null;
+      }
+      return;
+    }
+
     if (
-      hasHand &&
       signToConsider &&
       !['NO HAND', 'UNCERTAIN', 'UNKNOWN'].includes(signToConsider) &&
       pred.confidence >= confidenceThreshold
     ) {
       const isDifferent = signToConsider !== lastAddedSignRef.current;
-      const cooldownPassed = (now - lastSignAddedTimeRef.current) >= cooldownMs;
+      const cooldownPassed = (now - lastSignAddedTimeRef.current) >= Math.max(cooldownMs, 1200);
 
-      if (isDifferent || cooldownPassed) {
+      // Only add if it's a new gesture transition, not continuous repeated frames of the same sign
+      if (isDifferent) {
         lastAddedSignRef.current = signToConsider;
         lastSignAddedTimeRef.current = now;
 
         setState(prev => {
+          if (prev.accumulatedSigns.length > 0 && prev.accumulatedSigns[prev.accumulatedSigns.length - 1] === signToConsider) {
+            return prev;
+          }
           const newSigns = [...prev.accumulatedSigns, signToConsider];
           updateSentencesRef.current(newSigns);
           return { ...prev, accumulatedSigns: newSigns };
