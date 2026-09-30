@@ -3,7 +3,7 @@ import { PredictionResult, HandData } from '../types/isl';
 import { MediaPipeHandsService } from '../services/mediapipe';
 import { RealtimeWebSocketService } from '../services/websocket';
 import { ApiService } from '../services/api';
-import { TAMIL_MAP, SIGN_SENTENCES_MAP } from '../utils/tamilTranslations';
+import { TAMIL_MAP, SIGN_SENTENCES_MAP, SupportedLanguage } from '../utils/tamilTranslations';
 
 export interface RecognizerState {
   currentPrediction: PredictionResult | null;

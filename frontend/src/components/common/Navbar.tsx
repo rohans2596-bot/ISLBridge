@@ -13,12 +13,13 @@ import {
   X,
   Layers
 } from 'lucide-react';
+import { SupportedLanguage } from '../../utils/tamilTranslations';
 
 interface NavbarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  language: 'en' | 'ta';
-  setLanguage: (lang: 'en' | 'ta') => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
   modelReady: boolean;
 }
 

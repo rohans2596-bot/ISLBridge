@@ -12,10 +12,11 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AboutPage } from './pages/AboutPage';
 import { ApiService } from './services/api';
+import { SupportedLanguage } from './utils/tamilTranslations';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('landing');
-  const [language, setLanguage] = useState<'en' | 'ta'>('en');
+  const [language, setLanguage] = useState<SupportedLanguage>('ta');
   const [modelReady, setModelReady] = useState<boolean>(true);
 
   // Periodic Backend Health Check

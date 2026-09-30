@@ -8,10 +8,11 @@ import { StatusIndicator } from '../components/common/StatusIndicator';
 import { useCamera } from '../hooks/useCamera';
 import { useISLRecognizer } from '../hooks/useISLRecognizer';
 import { useSpeech } from '../hooks/useSpeech';
+import { SupportedLanguage } from '../utils/tamilTranslations';
 
 interface TranslatorPageProps {
-  language: 'en' | 'ta';
-  setLanguage: (lang: 'en' | 'ta') => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
   modelReady: boolean;
 }
 
@@ -40,7 +41,7 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
     saveCurrentSession,
   } = useISLRecognizer();
 
-  const { isSpeaking, speak, stop: stopSpeech } = useSpeech();
+  const { isSpeaking, autoSpeak, speak, stop: stopSpeech, toggleAutoSpeak } = useSpeech();
 
   // Connect camera to MediaPipe recognizer when camera turns active
   useEffect(() => {
@@ -64,7 +65,7 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Perform sign gesture in camera view. Recognized signs are smoothed and auto-assembled into fluent text and speech in real time.
+            Perform sign gesture in camera view. Auto-speaks recognized signs in 6 Indian languages with real-time translation.
           </p>
         </div>
 
@@ -135,6 +136,8 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
             onAddSpace={addSpace}
             onClear={clearSentence}
             onSaveSession={() => saveCurrentSession('Live User')}
+            autoSpeak={autoSpeak}
+            onToggleAutoSpeak={toggleAutoSpeak}
           />
         </div>
 

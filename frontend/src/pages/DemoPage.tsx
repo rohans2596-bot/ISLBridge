@@ -17,10 +17,11 @@ import { ConfidenceMeter } from '../components/translator/ConfidenceMeter';
 import { useCamera } from '../hooks/useCamera';
 import { useISLRecognizer } from '../hooks/useISLRecognizer';
 import { useSpeech } from '../hooks/useSpeech';
+import { SupportedLanguage } from '../utils/tamilTranslations';
 
 interface DemoPageProps {
-  language: 'en' | 'ta';
-  setLanguage: (lang: 'en' | 'ta') => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
   modelReady: boolean;
 }
 
