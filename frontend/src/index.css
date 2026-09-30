@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#FAF7F2] text-slate-900 antialiased selection:bg-skyblue-500/20 selection:text-skyblue-900 overflow-x-hidden;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom scrollbar with Sky Blue & Gold accents */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #FAF7F2;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(2, 132, 199, 0.3);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(2, 132, 199, 0.6);
+  }
+}
+
+@layer utilities {
+  /* Translucent Frosted Glass Panel for Beige White Canvas */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  }
+
+  /* Radiant Sky Blue Glass Panel */
+  .glass-panel-skyblue {
+    background: linear-gradient(135deg, rgba(240, 249, 255, 0.92) 0%, rgba(224, 242, 254, 0.82) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 12px 36px 0 rgba(14, 165, 233, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  }
+
+  /* Warm Ochre / Gold Glass Panel */
+  .glass-panel-gold {
+    background: linear-gradient(135deg, rgba(254, 252, 232, 0.92) 0%, rgba(254, 243, 199, 0.82) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(202, 138, 4, 0.35);
+    box-shadow: 0 12px 36px 0 rgba(202, 138, 4, 0.10), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .glass-panel-glow {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 12px 35px -5px rgba(56, 189, 248, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  }
+
+  /* Sky Blue Glass Action Buttons */
+  .glass-btn-primary {
+    background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(2, 132, 199, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-btn-primary:hover {
+    background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+    box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* Warm Gold / Ochre Action Button */
+  .glass-btn-gold {
+    background: linear-gradient(135deg, #CA8A04 0%, #A16207 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(202, 138, 4, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-btn-gold:hover {
+    background: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
+    box-shadow: 0 6px 24px rgba(202, 138, 4, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* Glass Inputs */
+  .glass-input {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    color: #0F172A;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+  }
+  .glass-input:focus {
+    border-color: rgba(2, 132, 199, 0.7);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    outline: none;
+  }
+
+  /* Ambient Mesh Gradients (Sky Blue & Warm Gold on Warm Beige White Canvas) */
+  .bg-ambient-mesh {
+    background-color: #FAF7F2;
+    background-image: 
+      radial-gradient(at 15% 15%, rgba(56, 189, 248, 0.12) 0px, transparent 55%),
+      radial-gradient(at 85% 20%, rgba(234, 179, 8, 0.10) 0px, transparent 50%),
+      radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.08) 0px, transparent 60%),
+      radial-gradient(at 80% 85%, rgba(229, 212, 191, 0.25) 0px, transparent 50%);
+  }
+
+  .text-satin-skyblue {
+    background: linear-gradient(135deg, #0369A1 0%, #0284C7 50%, #0EA5E9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-satin-gold {
+    background: linear-gradient(135deg, #854D0E 0%, #CA8A04 50%, #D4A359 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Subtle futuristic scanline overlay on camera */
+.scanline {
+  position: relative;
+}
+.scanline::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(2, 132, 199, 0.02), rgba(0, 0, 0, 0), rgba(2, 132, 199, 0.02));
+  z-index: 2;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.25;
+}
