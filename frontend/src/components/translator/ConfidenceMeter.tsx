@@ -22,7 +22,7 @@ export const ConfidenceMeter: React.FC<ConfidenceMeterProps> = ({ confidence, st
     low: {
       bar: 'bg-gradient-to-r from-slate-400 to-slate-500',
       text: 'text-slate-500',
-      label: 'LOW CONFIDENCE (UNCERTAIN)',
+      label: 'UNCERTAIN',
     },
   };
 

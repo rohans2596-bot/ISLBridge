@@ -116,12 +116,14 @@
   .text-satin-skyblue {
     background: linear-gradient(135deg, #0369A1 0%, #0284C7 50%, #0EA5E9 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .text-satin-gold {
     background: linear-gradient(135deg, #854D0E 0%, #CA8A04 50%, #D4A359 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 }

@@ -17,7 +17,7 @@ async def websocket_translate(websocket: WebSocket):
     and returns immediate prediction + smoothed trigger events.
     """
     await websocket.accept()
-    smoother = TemporalSmoother(window_size=10, min_stable_frames=6, cooldown_seconds=1.2)
+    smoother = TemporalSmoother(window_size=12, min_stable_frames=8, cooldown_seconds=1.5)
     classifier = ISLClassifier.get_instance()
 
     try:

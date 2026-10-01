@@ -1,4 +1,4 @@
-import { ISLSign, ModelMetrics, TranslationSession, AnalyticsData, PredictionResult } from '../types/isl';
+import { ISLSign, ModelMetrics, TranslationSession, AnalyticsData, PredictionResult, VideoAnalysisResponse } from '../types/isl';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -36,6 +36,7 @@ export class ApiService {
     landmarks?: { x: number; y: number; z?: number }[];
     handedness?: string;
     hands?: { landmarks: { x: number; y: number; z?: number }[]; handedness: string }[];
+    motion?: { dx: number; dy: number; dz: number; speed: number; dir_x: number; dir_y: number };
   }): Promise<PredictionResult> {
     return this.request('/api/predict', {
       method: 'POST',
@@ -120,6 +121,29 @@ export class ApiService {
   static async deleteHistory(id: number): Promise<any> {
     return this.request(`/api/translation/history/${id}`, {
       method: 'DELETE'
+    });
+  }
+
+  // Video Translator
+  static async analyzeVideoFile(file: File): Promise<VideoAnalysisResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const url = `${API_BASE_URL}/api/video/analyze`;
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      throw new Error(errorBody.detail || `Video analysis failed with status ${response.status}`);
+    }
+    return await response.json();
+  }
+
+  static async analyzeYouTubeVideo(youtubeUrl: string): Promise<VideoAnalysisResponse> {
+    return this.request('/api/video/analyze-youtube', {
+      method: 'POST',
+      body: JSON.stringify({ url: youtubeUrl }),
     });
   }
 

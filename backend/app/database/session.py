@@ -1,15 +1,18 @@
 import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 from app.config import DATABASE_URL, DATA_DIR
 from app.database.models import Base, Sign
 
-db_path_str = str(DATA_DIR / 'islbridge.db')
+db_path_str = (DATA_DIR / 'islbridge.db').resolve().as_posix()
+sqlite_url = f"sqlite:///{db_path_str}"
 
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
-        "sqlite://",
-        creator=lambda: sqlite3.connect(db_path_str, check_same_thread=False)
+        sqlite_url,
+        connect_args={"check_same_thread": False},
+        poolclass=NullPool
     )
 else:
     engine = create_engine(DATABASE_URL)
@@ -21,7 +24,10 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -76,6 +82,8 @@ def init_db():
                     samples_count=50
                 )
                 db.add(sign)
-            db.commit()
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass

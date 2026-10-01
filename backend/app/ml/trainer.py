@@ -50,7 +50,12 @@ def train_isl_model(
                 class_names.append(s_name)
             
             feat = np.array(sample.features, dtype=np.float32)
-            if len(feat) == 222:
+            if len(feat) == 262:
+                X_all.append(feat)
+                y_all.append(class_to_idx[s_name])
+            elif len(feat) == 256:
+                # Pad with 6 motion zeros
+                feat = np.pad(feat, (0, 6), mode="constant")
                 X_all.append(feat)
                 y_all.append(class_to_idx[s_name])
 
@@ -116,8 +121,8 @@ def train_isl_model(
         "created_at": datetime.utcnow().isoformat() + "Z"
     }
 
-    # Save to disk
-    joblib.dump(pipeline, MODEL_FILE)
+    # Save to disk with compression
+    joblib.dump(pipeline, MODEL_FILE, compress=3)
     with open(METADATA_FILE, "w") as f:
         json.dump(metadata, f, indent=2)
 

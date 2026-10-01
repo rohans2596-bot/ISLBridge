@@ -71,8 +71,8 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         )}
       </div>
 
-      {/* Device Switcher Dropdown */}
-      {devices.length > 1 && (
+      {/* Device Switcher Dropdown or Camera Status Pill */}
+      {devices.length > 1 ? (
         <div className="flex items-center gap-2 text-xs">
           <Sliders className="w-3.5 h-3.5 text-slate-500" />
           <select
@@ -87,7 +87,12 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
             ))}
           </select>
         </div>
-      )}
+      ) : isActive ? (
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono">
+          <span className={`w-2 h-2 rounded-full ${isPaused ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}`} />
+          <span className="text-slate-700 font-semibold">{isPaused ? 'STREAM PAUSED' : 'LIVE 720P'}</span>
+        </div>
+      ) : null}
 
     </div>
   );

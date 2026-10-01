@@ -64,6 +64,7 @@ export class RealtimeWebSocketService {
     landmarks?: any[];
     handedness?: string;
     hands?: any[];
+    motion?: any;
     timestamp?: string;
   }) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {

@@ -43,10 +43,10 @@ class ISLClassifier:
                     self.metadata = json.load(f)
                 self.classes = self.metadata.get("classes", [])
                 
-                # Check if trained feature dimensions match current feature extractor (256)
+                # Check if trained feature dimensions match current feature extractor (262)
                 if hasattr(self.pipeline, "named_steps"):
                     scaler = self.pipeline.named_steps.get("scaler")
-                    if scaler and hasattr(scaler, "n_features_in_") and scaler.n_features_in_ == 256:
+                    if scaler and hasattr(scaler, "n_features_in_") and scaler.n_features_in_ == 262:
                         logger.info(f"Loaded existing ISL model with {len(self.classes)} classes.")
                         return
             except Exception as e:
@@ -110,8 +110,8 @@ class ISLClassifier:
             "created_at": "2026-09-30T15:00:00Z"
         }
 
-        # Save model and metadata
-        joblib.dump(pipeline, MODEL_FILE)
+        # Save model and metadata with compression
+        joblib.dump(pipeline, MODEL_FILE, compress=3)
         with open(METADATA_FILE, "w") as f:
             json.dump(self.metadata, f, indent=2)
 
@@ -135,8 +135,8 @@ class ISLClassifier:
 
         feature_vector = extract_features_from_payload(payload)
         
-        # Check if hand is detected (presence flags at index -4 and -3)
-        left_p, right_p = feature_vector[-4], feature_vector[-3]
+        # Check if hand is detected (presence flags at metadata index 252 and 253)
+        left_p, right_p = feature_vector[252], feature_vector[253]
         if left_p < 0.5 and right_p < 0.5:
             return {
                 "sign": "NO HAND",

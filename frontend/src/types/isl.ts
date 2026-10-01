@@ -9,6 +9,21 @@ export interface HandData {
   handedness: 'Left' | 'Right';
 }
 
+export interface MotionData {
+  dx: number;
+  dy: number;
+  dz: number;
+  speed: number;
+  dir_x: number;
+  dir_y: number;
+}
+
+export interface LandmarkPayload {
+  hands: Array<{ landmarks: LandmarkPoint[]; handedness: 'Left' | 'Right' }>;
+  motion?: MotionData;
+  timestamp?: string;
+}
+
 export interface PredictionResult {
   sign: string;
   raw_sign: string;
@@ -105,4 +120,37 @@ export interface AccessibilitySettings {
   cameraResolution: '480p' | '720p' | '1080p';
   preferredCameraId?: string;
   storeConsent: boolean;
+}
+
+export interface VideoAnalysisStep {
+  step: string;
+  status: 'pending' | 'running' | 'done' | 'error';
+  detail: string;
+}
+
+export interface DetectedSignItem {
+  sign: string;
+  confidence: number;
+  frame_index: number;
+  timestamp_sec: number;
+}
+
+export interface VideoAnalysisResponse {
+  video_id: string;
+  source_type: 'upload' | 'youtube';
+  status: 'completed' | 'error';
+  steps: VideoAnalysisStep[];
+  detected_signs: DetectedSignItem[];
+  deduplicated_signs: string[];
+  english_text: string;
+  tamil_text: string;
+  hindi_text: string;
+  telugu_text: string;
+  kannada_text: string;
+  malayalam_text: string;
+  total_frames: number;
+  sampled_frames: number;
+  hands_detected_frames: number;
+  processing_time_sec: number;
+  video_url?: string;
 }

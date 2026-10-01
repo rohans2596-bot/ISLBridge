@@ -16,6 +16,7 @@ class PredictRequest(BaseModel):
     hands: Optional[List[HandData]] = None
     left_hand: Optional[List[LandmarkPoint]] = None
     right_hand: Optional[List[LandmarkPoint]] = None
+    motion: Optional[Dict[str, float]] = None
     timestamp: Optional[str] = None
 
 class TopKPrediction(BaseModel):

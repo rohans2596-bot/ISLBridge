@@ -212,155 +212,146 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
       </div>
 
       {/* Multi-Language Translation Output */}
-      <div className="p-4 rounded-2xl bg-white/90 border border-stone-200 space-y-2.5 shadow-2xs">
-        
-        {/* English - always visible */}
+      {accumulatedSigns.length === 0 ? (
+        <div className="p-6 rounded-2xl bg-white/60 border border-dashed border-stone-300 text-center space-y-2 shadow-2xs">
+          <div className="w-10 h-10 mx-auto rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200 shadow-2xs">
+            <Languages className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-bold text-slate-700">Translations Appear Here</p>
+          <p className="text-[11px] text-slate-400 max-w-[280px] mx-auto leading-relaxed">
+            Perform signs in front of the camera. Instant translations in English, Tamil, Hindi, Telugu, Kannada & Malayalam will accumulate here.
+          </p>
+        </div>
+      ) : (
+        <div className="p-4 rounded-2xl bg-white/95 border border-stone-200 space-y-3 shadow-2xs">
+          {/* Active / Selected Language Hero Card */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-sky-50 via-sky-50/60 to-amber-50/40 border border-sky-200">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] font-mono font-bold text-sky-800 uppercase tracking-wider flex items-center gap-1.5">
+                <span>{langInfo.flag}</span>
+                <span>{langInfo.name} ({langInfo.nativeName})</span>
+              </span>
+              <span className="text-[9px] bg-sky-600 text-white px-2 py-0.5 rounded-full font-mono font-bold shadow-2xs">
+                VOICE TARGET
+              </span>
+            </div>
+            <p className="text-lg font-black text-slate-900 leading-snug">
+              {getCurrentSentence(language) || rawSentence}
+            </p>
+          </div>
+
+          {/* Other Languages in Compact Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-stone-100">
+            {LANGUAGES.filter(l => l.code !== language).map(l => {
+              const transText = l.code === 'en'
+                ? (englishSentence || multiLang.en || rawSentence)
+                : (l.code === 'ta' ? (tamilSentence || multiLang.ta) : multiLang[l.code]);
+
+              return (
+                <div key={l.code} className="p-2 rounded-lg bg-stone-50 border border-stone-200/80 text-left">
+                  <span className="text-[9.5px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+                    {l.flag} {l.name}:
+                  </span>
+                  <p className="text-xs font-bold text-slate-800 truncate mt-0.5" title={transText}>
+                    {transText || '—'}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Action Toolbar & Language Selector */}
+      <div className="space-y-2 pt-1">
+        {/* Multi-Language Selector Tabs (6-column grid) */}
         <div>
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-semibold">
-            🇬🇧 English:
+          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-semibold mb-1">
+            Target Voice & Translation Language
           </span>
-          <p className="text-base sm:text-lg font-bold text-slate-900 min-h-[28px] tracking-tight">
-            {englishSentence || multiLang.en || (accumulatedSigns.length > 0 ? rawSentence : '—')}
-          </p>
+          <div className="grid grid-cols-6 gap-1 w-full bg-stone-100/90 p-1 rounded-xl border border-stone-200 text-xs shadow-2xs">
+            {LANGUAGES.map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => setLanguage(lang.code)}
+                className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all truncate text-center cursor-pointer ${
+                  language === lang.code
+                    ? `${lang.bgColor} text-white shadow-xs`
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+                title={`${lang.name} (${lang.nativeName})`}
+              >
+                {lang.nativeName.length > 5 ? lang.nativeName.slice(0, 5) : lang.nativeName}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Tamil */}
-        <div className="pt-2 border-t border-stone-100">
-          <span className="text-[10px] font-mono text-amber-700 uppercase tracking-wider block font-semibold">
-            🇮🇳 தமிழ் (Tamil):
-          </span>
-          <p className="text-base sm:text-lg font-bold text-amber-900 min-h-[24px]">
-            {tamilSentence || multiLang.ta || '—'}
-          </p>
-        </div>
-
-        {/* Hindi */}
-        <div className="pt-2 border-t border-stone-100">
-          <span className="text-[10px] font-mono text-orange-700 uppercase tracking-wider block font-semibold">
-            🇮🇳 हिन्दी (Hindi):
-          </span>
-          <p className="text-base sm:text-lg font-bold text-orange-900 min-h-[24px]">
-            {multiLang.hi || '—'}
-          </p>
-        </div>
-
-        {/* Telugu */}
-        <div className="pt-2 border-t border-stone-100">
-          <span className="text-[10px] font-mono text-emerald-700 uppercase tracking-wider block font-semibold">
-            🇮🇳 తెలుగు (Telugu):
-          </span>
-          <p className="text-base sm:text-lg font-bold text-emerald-900 min-h-[24px]">
-            {multiLang.te || '—'}
-          </p>
-        </div>
-
-        {/* Kannada */}
-        <div className="pt-2 border-t border-stone-100">
-          <span className="text-[10px] font-mono text-violet-700 uppercase tracking-wider block font-semibold">
-            🇮🇳 ಕನ್ನಡ (Kannada):
-          </span>
-          <p className="text-base sm:text-lg font-bold text-violet-900 min-h-[24px]">
-            {multiLang.kn || '—'}
-          </p>
-        </div>
-
-        {/* Malayalam */}
-        <div className="pt-2 border-t border-stone-100">
-          <span className="text-[10px] font-mono text-rose-700 uppercase tracking-wider block font-semibold">
-            🇮🇳 മലയാളം (Malayalam):
-          </span>
-          <p className="text-base sm:text-lg font-bold text-rose-900 min-h-[24px]">
-            {multiLang.ml || '—'}
-          </p>
-        </div>
-      </div>
-
-      {/* Action Buttons Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-        
-        {/* Left Side: Speech Button + Language Selector */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Buttons Row */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Speak Button */}
           <button
             onClick={handleSpeakClick}
             disabled={accumulatedSigns.length === 0}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer ${
               isSpeaking
                 ? 'bg-rose-600 text-white animate-pulse'
                 : 'glass-btn-primary'
             }`}
           >
             {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            <span>{isSpeaking ? 'Stop' : `Speak`}</span>
+            <span>{isSpeaking ? 'Stop' : 'Speak'}</span>
           </button>
 
-          {/* Multi-Language Selector */}
-          <div className="flex bg-white/90 rounded-xl p-0.5 border border-stone-200 text-xs shadow-2xs flex-wrap gap-0.5">
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                onClick={() => setLanguage(lang.code)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                  language === lang.code
-                    ? `${lang.bgColor} text-white shadow-xs`
-                    : 'text-slate-500 hover:text-slate-700'
-                }`}
-                title={`${lang.name} (${lang.nativeName})`}
-              >
-                {lang.nativeName.length > 6 ? lang.name.slice(0, 2).toUpperCase() : lang.nativeName}
-              </button>
-            ))}
+          {/* Quick Actions Toolbar */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onUndo}
+              disabled={accumulatedSigns.length === 0}
+              className="p-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
+              title="Undo last sign"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={onAddSpace}
+              className="p-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs shadow-2xs cursor-pointer"
+              title="Add space"
+            >
+              <Space className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={onClear}
+              disabled={accumulatedSigns.length === 0}
+              className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
+              title="Clear all"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={handleCopy}
+              disabled={accumulatedSigns.length === 0}
+              className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
+              title="Copy text"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              <span className="text-[11px] font-semibold">{copied ? 'Copied' : 'Copy'}</span>
+            </button>
+
+            <button
+              onClick={handleSave}
+              disabled={accumulatedSigns.length === 0 || isSaving}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 text-xs font-bold disabled:opacity-40 shadow-xs cursor-pointer"
+              title="Save session"
+            >
+              <BookmarkCheck className="w-3.5 h-3.5" />
+              <span className="text-[11px]">{saved ? 'Saved!' : 'Save'}</span>
+            </button>
           </div>
         </div>
-
-        {/* Right Side Controls: Undo, Space, Clear, Copy, Save */}
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={onUndo}
-            disabled={accumulatedSigns.length === 0}
-            className="p-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
-            title="Undo last sign"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={onAddSpace}
-            className="p-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs shadow-2xs cursor-pointer"
-            title="Add space"
-          >
-            <Space className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={onClear}
-            disabled={accumulatedSigns.length === 0}
-            className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
-            title="Clear all"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={handleCopy}
-            disabled={accumulatedSigns.length === 0}
-            className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-white border border-stone-200 text-slate-700 hover:bg-stone-50 text-xs disabled:opacity-40 shadow-2xs cursor-pointer"
-            title="Copy text"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            <span className="text-[11px] font-semibold">{copied ? 'Copied' : 'Copy'}</span>
-          </button>
-
-          <button
-            onClick={handleSave}
-            disabled={accumulatedSigns.length === 0 || isSaving}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 text-xs font-bold disabled:opacity-40 shadow-xs cursor-pointer"
-            title="Save session"
-          >
-            <BookmarkCheck className="w-3.5 h-3.5" />
-            <span className="text-[11px]">{saved ? 'Saved!' : 'Save'}</span>
-          </button>
-        </div>
-
       </div>
 
     </div>

@@ -11,6 +11,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AboutPage } from './pages/AboutPage';
+import { VideoTranslatorPage } from './pages/VideoTranslatorPage';
 import { ApiService } from './services/api';
 import { SupportedLanguage } from './utils/tamilTranslations';
 
@@ -73,6 +74,10 @@ export function App() {
             setLanguage={setLanguage}
             modelReady={modelReady}
           />
+        )}
+
+        {activeTab === 'video-translator' && (
+          <VideoTranslatorPage />
         )}
 
         {activeTab === 'demo' && (

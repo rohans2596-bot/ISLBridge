@@ -46,11 +46,11 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
   // Connect camera to MediaPipe recognizer when camera turns active
   useEffect(() => {
     if (cameraState.isActive && !cameraState.isPaused && videoRef.current) {
-      startRecognition(videoRef.current);
+      startRecognition(videoRef.current, onFrame);
     } else {
       stopRecognition();
     }
-  }, [cameraState.isActive, cameraState.isPaused]);
+  }, [cameraState.isActive, cameraState.isPaused, onFrame, startRecognition, stopRecognition]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -77,11 +77,11 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
         />
       </div>
 
-      {/* Main 3-Column Translator Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Main 3-Column Balanced Translator Workspace */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        {/* LEFT COLUMN: Live Camera Feed & Controls (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
+        {/* LEFT COLUMN: Live Camera Feed & Controls (4 cols) */}
+        <div className="lg:col-span-4 space-y-4">
           <CameraView
             videoRef={videoRef}
             canvasRef={canvasRef}
@@ -92,6 +92,9 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
             fps={cameraState.fps}
             handDetected={recognizerState.handDetected}
             handsCount={recognizerState.handsCount}
+            estimatedDistanceCm={recognizerState.handDistanceCm}
+            distanceStatus={recognizerState.handDistanceStatus}
+            interHandDistanceCm={recognizerState.interHandDistanceCm}
             onFrame={onFrame}
             onStartCamera={() => startCamera()}
           />
@@ -121,8 +124,8 @@ export const TranslatorPage: React.FC<TranslatorPageProps> = ({
           />
         </div>
 
-        {/* RIGHT COLUMN: Sentence Construction & TTS (3 cols on desktop, responsive) */}
-        <div className="lg:col-span-3 space-y-4">
+        {/* RIGHT COLUMN: Sentence Construction & TTS (4 cols) */}
+        <div className="lg:col-span-4 space-y-4">
           <SentenceBuilder
             accumulatedSigns={recognizerState.accumulatedSigns}
             englishSentence={recognizerState.englishSentence}

@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 echo ===================================================
 echo   Starting ISLBridge AI Full-Stack Application
 echo ===================================================
@@ -11,13 +12,14 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 echo Starting Backend Server (FastAPI on http://localhost:8000)...
-start "ISLBridge Backend" cmd /k "cd backend && %PYTHON_CMD% -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+start "ISLBridge Backend" cmd /k "chcp 65001 >nul && cd /d "%~dp0backend" && %PYTHON_CMD% -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 echo Starting Frontend Server (Vite on http://localhost:5173)...
-start "ISLBridge Frontend" cmd /k "cd frontend && npm run dev"
+start "ISLBridge Frontend" cmd /k "chcp 65001 >nul && cd /d "%~dp0frontend" && npm run dev"
 
 echo.
 echo Application is starting!
 echo Frontend: http://localhost:5173
 echo Backend API Docs: http://localhost:8000/docs
 echo ===================================================
+pause

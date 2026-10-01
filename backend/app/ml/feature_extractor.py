@@ -76,11 +76,35 @@ def normalize_single_hand(landmarks: Any) -> np.ndarray:
     return np.concatenate([flattened_coords, extra_features])  # 63 + 21 = 84 features
 
 
+def extract_motion_features(motion_payload: Dict[str, Any]) -> np.ndarray:
+    """
+    Extracts 6 motion features from motion tracking payload.
+    Returns: [dx, dy, dz, speed, dir_x, dir_y]
+    - dx/dy/dz: normalized displacement over the tracking window
+    - speed: magnitude of motion (0=static, 1=fast)
+    - dir_x/dir_y: unit vector of primary motion direction
+    """
+    dx    = float(motion_payload.get("dx", 0.0))
+    dy    = float(motion_payload.get("dy", 0.0))
+    dz    = float(motion_payload.get("dz", 0.0))
+    speed = float(motion_payload.get("speed", 0.0))
+    dir_x = float(motion_payload.get("dir_x", 0.0))
+    dir_y = float(motion_payload.get("dir_y", 0.0))
+    # Clamp to reasonable range
+    dx    = np.clip(dx, -1.0, 1.0)
+    dy    = np.clip(dy, -1.0, 1.0)
+    dz    = np.clip(dz, -1.0, 1.0)
+    speed = np.clip(speed, 0.0, 1.0)
+    dir_x = np.clip(dir_x, -1.0, 1.0)
+    dir_y = np.clip(dir_y, -1.0, 1.0)
+    return np.array([dx, dy, dz, speed, dir_x, dir_y], dtype=np.float32)
+
+
 def extract_features_from_payload(payload: Dict[str, Any]) -> np.ndarray:
     """
     Extracts a consolidated feature vector from frontend landmark payload.
     Supports single hand, both hands, or structured handedness lists.
-    Total length: 84 (left) + 84 (right) + 84 (combined_primary) + 4 (metadata) = 256 features.
+    Total length: 84 (left) + 84 (right) + 84 (combined_primary) + 4 (metadata) + 6 (motion) = 262 features.
     """
     left_features = np.zeros(84, dtype=np.float32)
     right_features = np.zeros(84, dtype=np.float32)
@@ -144,11 +168,19 @@ def extract_features_from_payload(payload: Dict[str, Any]) -> np.ndarray:
 
     metadata = np.array([left_present, right_present, inter_wrist_dist, inter_tip_dist], dtype=np.float32)
 
+    # Motion features (6) — populated by frontend tracker, zeros if not provided
+    motion_data = payload.get("motion", None)
+    if motion_data and isinstance(motion_data, dict):
+        motion_features = extract_motion_features(motion_data)
+    else:
+        motion_features = np.zeros(6, dtype=np.float32)
+
     feature_vector = np.concatenate([
-        left_features,
-        right_features,
-        combined_primary,
-        metadata
+        left_features,       # 84
+        right_features,      # 84
+        combined_primary,    # 84
+        metadata,            # 4
+        motion_features      # 6  → total 262
     ])
     
     return feature_vector

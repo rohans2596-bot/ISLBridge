@@ -11,6 +11,9 @@ interface CameraViewProps {
   fps: number;
   handDetected: boolean;
   handsCount: number;
+  estimatedDistanceCm?: number | null;
+  distanceStatus?: 'optimal' | 'close' | 'far' | null;
+  interHandDistanceCm?: number | null;
   onFrame?: () => void;
   onStartCamera: () => void;
 }
@@ -25,6 +28,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
   fps,
   handDetected,
   handsCount,
+  estimatedDistanceCm,
+  distanceStatus,
+  interHandDistanceCm,
+  onFrame,
   onStartCamera,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -87,9 +94,30 @@ export const CameraView: React.FC<CameraViewProps> = ({
               ? 'bg-skyblue-950/90 border-skyblue-400/60 text-white shadow-lg shadow-skyblue-950/50' 
               : 'bg-black/80 border-white/10 text-zinc-400'
           }`}>
-            <span className={`w-2 h-2 rounded-full ${handDetected ? 'bg-skyblue-400 shadow-[0_0_8px_rgba(56,189,248,0.8)] animate-ping' : 'bg-zinc-600'}`} />
+            <span className={`w-2 h-2 rounded-full ${handDetected ? 'bg-skyblue-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]' : 'bg-zinc-600'}`} />
             <span>{handDetected ? `${handsCount} HAND${handsCount > 1 ? 'S' : ''} DETECTED` : 'WAITING FOR GESTURE'}</span>
           </div>
+
+          {/* Distance Calculating Feature Pill (Always visible while hand detected) */}
+          {handDetected && estimatedDistanceCm && (
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono backdrop-blur-md border shadow-lg transition-colors duration-200 ${
+              distanceStatus === 'optimal' 
+                ? 'bg-emerald-950/90 border-emerald-400/60 text-emerald-300' 
+                : distanceStatus === 'close'
+                ? 'bg-amber-950/90 border-amber-400/60 text-amber-300'
+                : 'bg-sky-950/90 border-sky-400/60 text-sky-300'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                distanceStatus === 'optimal' ? 'bg-emerald-400' : distanceStatus === 'close' ? 'bg-amber-400' : 'bg-sky-400'
+              }`} />
+              <span>DIST: <strong>{estimatedDistanceCm} CM</strong> ({distanceStatus === 'optimal' ? 'OPTIMAL' : distanceStatus === 'close' ? 'TOO CLOSE' : 'MOVE CLOSER'})</span>
+              {interHandDistanceCm && handsCount > 1 && (
+                <span className="ml-1 pl-1.5 border-l border-white/20 text-sky-200">
+                  SPAN: <strong>{interHandDistanceCm} CM</strong>
+                </span>
+              )}
+            </div>
+          )}
 
           {/* FPS Badge */}
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-black/80 border border-white/10 text-zinc-300 backdrop-blur-md">

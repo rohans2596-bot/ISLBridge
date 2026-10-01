@@ -11,7 +11,8 @@ import {
   BookOpen, 
   Menu, 
   X,
-  Layers
+  Layers,
+  Film
 } from 'lucide-react';
 import { SupportedLanguage } from '../../utils/tamilTranslations';
 
@@ -35,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { id: 'landing', label: 'Home', icon: Sparkles },
     { id: 'translator', label: 'Translator', icon: Video, badge: 'Live' },
+    { id: 'video-translator', label: 'Video Translator', icon: Film, badge: 'New' },
     { id: 'demo', label: 'Demo Mode', icon: Play, highlight: true },
     { id: 'training', label: 'Training', icon: Cpu },
     { id: 'dataset', label: 'Dataset', icon: Database },

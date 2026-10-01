@@ -207,8 +207,26 @@ COMPOUND_INTENT_DATA = [
     (["COME", "HOME"], "Please come to my home.", "தயவுசெய்து எங்கள் வீட்டிற்கு வாருங்கள்."),
     (["COME", "HELP"], "Please come here and help me.", "தயவுசெய்து இங்கே வந்து எனக்கு உதவுங்கள்."),
     (["STOP", "PLEASE"], "Please stop right here.", "தயவுசெய்து இங்கே நிறுத்துங்கள்."),
-    (["WAIT", "PLEASE"], "Please wait a moment for me.", "தயவுசெய்து எனக்காக சிறிது நேரம் காத்திருங்கள்.")
+    (["WAIT", "PLEASE"], "Please wait a moment for me.", "தயவுசெய்து எனக்காக சிறிது நேரம் காத்திருங்கள்."),
+    (["SHORT", "BOY"], "Mamata took a jibe at the Election Commissioner.", "மம்தா தேர்தல் ஆணையரை விமர்சித்தார்."),
+    (["SHORT"], "Mamata took a jibe at the Election Commissioner.", "மம்தா தேர்தல் ஆணையரை விமர்சித்தார்."),
+    (["BOY"], "Mamata took a jibe at the Election Commissioner.", "மம்தா தேர்தல் ஆணையரை விமர்சித்தார்.")
 ]
+
+# Dynamic sentence loader
+CUSTOM_SENTENCES_FILE = Path(__file__).resolve().parent / "custom_sentences.json"
+
+def get_dynamic_intents():
+    dynamic = []
+    if CUSTOM_SENTENCES_FILE.exists():
+        try:
+            with open(CUSTOM_SENTENCES_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for item in data:
+                    dynamic.append((item['sequence'], item['en'], item['ta']))
+        except Exception as e:
+            print("Error loading custom sentences", e)
+    return COMPOUND_INTENT_DATA + dynamic
 
 
 class SentencePredictionEngine:
@@ -296,16 +314,17 @@ class SentencePredictionEngine:
         logger.info(f"Trained RandomForest Sentence Predictor with {len(self.intent_labels)} intent classes.")
 
     def load_or_train_sentence_model(self):
-        if SENTENCE_MODEL_FILE.exists():
-            try:
-                data = joblib.load(SENTENCE_MODEL_FILE)
-                self.vectorizer = data["vectorizer"]
-                self.rf_model = data["rf"]
-                self.intent_labels = data["labels"]
-                logger.info(f"Loaded existing Sentence Prediction model with {len(self.intent_labels)} intents.")
-                return
-            except Exception as e:
-                logger.warning(f"Failed to load sentence model: {e}. Retraining...")
+        if False: # Force Retrain
+            if SENTENCE_MODEL_FILE.exists():
+                try:
+                    data = joblib.load(SENTENCE_MODEL_FILE)
+                    self.vectorizer = data["vectorizer"]
+                    self.rf_model = data["rf"]
+                    self.intent_labels = data["labels"]
+                    logger.info(f"Loaded existing Sentence Prediction model with {len(self.intent_labels)} intents.")
+                    return
+                except Exception as e:
+                    logger.warning(f"Failed to load sentence model: {e}. Retraining...")
         self.train_models()
 
     def predict_sentence(self, signs: List[str]) -> Tuple[str, str, float]:

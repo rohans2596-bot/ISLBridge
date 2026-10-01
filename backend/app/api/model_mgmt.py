@@ -99,3 +99,37 @@ def get_model_history(db: Session = Depends(get_db)):
         }
         for m in models
     ]
+
+
+from pydantic import BaseModel
+import json
+from pathlib import Path
+
+class CustomSentenceRequest(BaseModel):
+    sequence: list[str]
+    en: str
+    ta: str
+
+@router.post("/model/train-sentence")
+def train_custom_sentence(req: CustomSentenceRequest):
+    custom_file = Path(__file__).resolve().parent.parent / "ml" / "custom_sentences.json"
+    data = []
+    if custom_file.exists():
+        with open(custom_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+    data.append({
+        "sequence": req.sequence,
+        "en": req.en,
+        "ta": req.ta
+    })
+    
+    with open(custom_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        
+    # Trigger retraining
+    from app.ml.sentence_predictor import SentencePredictionEngine
+    engine = SentencePredictionEngine.get_instance()
+    engine.train_models()
+    
+    return {"status": "success", "message": "Sentence added and model retrained!"}

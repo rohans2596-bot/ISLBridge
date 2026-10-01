@@ -12,6 +12,7 @@ from app.api.model_mgmt import router as model_router
 from app.api.translations import router as translation_router
 from app.api.analytics import router as analytics_router
 from app.api.websocket import router as websocket_router
+from app.api.video_translator import router as video_router
 
 # Setup logging
 logging.basicConfig(
@@ -52,6 +53,7 @@ app.include_router(dataset_router, prefix=API_V1_STR)
 app.include_router(model_router, prefix=API_V1_STR)
 app.include_router(translation_router, prefix=API_V1_STR)
 app.include_router(analytics_router, prefix=API_V1_STR)
+app.include_router(video_router, prefix=API_V1_STR)
 app.include_router(websocket_router)  # root /ws/translate
 
 @app.get("/health", tags=["System"])
